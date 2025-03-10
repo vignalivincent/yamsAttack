@@ -37,7 +37,7 @@ export const usePlayers = () =>
     useShallow((state) => ({
       players: state.players,
       getLeaderboard: state.getLeaderboard,
-      canAddPlayer: state.canAddPlayer,
+      canAddPlayer: state.canAddPlayer(),
       doAddPlayer: state.addPlayer,
       doRemovePlayer: state.removePlayer,
     }))

@@ -17,7 +17,7 @@ export const AddPlayerForm: FC<AddPlayerFormProps> = ({ onAdd }) => {
   const [name, setName] = useState('');
   const { canAddPlayer } = usePlayers();
   const { toast } = useToast();
-  const preventAddPlayer = !canAddPlayer();
+  const preventAddPlayer = !canAddPlayer;
 
   const handleAdd = () => {
     if (name.trim()) {

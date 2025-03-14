@@ -49,8 +49,22 @@ export interface GameHistory {
 
 export interface GameState {
   players: Player[];
-  isStarted: boolean;
+  isGameStarted: boolean;
   gameHistory: GameHistory[];
 }
 
 export type Leaderboard = PlayerLeaderBoard[];
+
+export interface PlayerStats {
+  gamesPlayed: number;
+  wins: number;
+  highestScore: number;
+  averageScore: number;
+  name: string;
+}
+
+export interface Score {
+  value: ScoreState;
+  playerId: string;
+  category: ScoreCategory;
+}

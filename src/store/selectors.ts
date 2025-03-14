@@ -1,0 +1,33 @@
+import { useShallow } from 'zustand/react/shallow';
+import { useGameStore } from './gameStore';
+import { computeActivePlayerListStat, getLeaderboard } from './utils';
+
+// State Selector
+export const usePlayerList = () => useGameStore(useShallow((state) => state.playerList));
+export const useGameHistoryList = () => useGameStore(useShallow((state) => state.gameHistoryList));
+export const useIsGameStarted = () => useGameStore(useShallow((state) => state.isGameStarted));
+export const useIsGameEnded = () => useGameStore(useShallow((state) => state.isGameEnded));
+export const useIsGameCompleted = () => useGameStore(useShallow((state) => state.isGameCompleted));
+export const useCanAddPlayer = () => useGameStore(useShallow((state) => state.canAddPlayer));
+
+// Derived state Selector
+export const useLeaderBoard = () => {
+  const playerList = usePlayerList();
+  return getLeaderboard(playerList);
+};
+
+export const usePlayerListWithStat = () => {
+  const playerList = usePlayerList();
+  const gameHistoryList = useGameHistoryList();
+  return computeActivePlayerListStat(playerList, gameHistoryList);
+};
+
+// Actions Selector
+export const useActions = () => ({
+  addPlayer: useGameStore(useShallow((state) => state.addPlayer)),
+  removePlayer: useGameStore(useShallow((state) => state.removePlayer)),
+  addScore: useGameStore(useShallow((state) => state.addScore)),
+  startGame: useGameStore(useShallow((state) => state.startGame)),
+  endGame: useGameStore(useShallow((state) => state.endGame)),
+  leaveGame: useGameStore(useShallow((state) => state.leaveGame)),
+});

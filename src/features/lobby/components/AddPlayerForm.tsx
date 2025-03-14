@@ -2,22 +2,20 @@ import { FC, useState, KeyboardEvent } from 'react';
 import { Button } from '@/ui/components/button';
 import { Input } from '@/ui/components/input';
 import { useToast } from '@/ui/hooks/use-toast';
-import { generateBarbaName } from '@/utils/nameGenerator';
+import { generateBarbaName } from '@/features/lobby/services/nameGenerator';
 import { t } from 'i18next';
-import { usePlayers } from '@/store/gameStore';
-import { TOAST_MESSAGES } from '@/features/game/constants/toastMessages';
+import { TOAST_MESSAGES } from '@/constants/toastMessages';
+import { MAX_NAME_LENGTH } from '@/constants/maxPlayerNameLength';
 
 interface AddPlayerFormProps {
   onAdd: (name: string) => boolean;
+  canAddPlayer: boolean;
 }
 
-const MAX_NAME_LENGTH = 10;
-
-export const AddPlayerForm: FC<AddPlayerFormProps> = ({ onAdd }) => {
-  const [name, setName] = useState('');
-  const { canAddPlayer } = usePlayers();
+export const AddPlayerForm: FC<AddPlayerFormProps> = ({ onAdd, canAddPlayer }) => {
   const { toast } = useToast();
-  const preventAddPlayer = !canAddPlayer();
+  const [name, setName] = useState('');
+  const preventAddPlayer = !canAddPlayer;
 
   const handleAdd = () => {
     if (name.trim()) {

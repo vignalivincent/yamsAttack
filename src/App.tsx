@@ -1,15 +1,22 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PlayersList } from '@/features/lobby/components/PlayersList';
-import { ScoreBoard } from '@/features/game/components/ScoreBoard';
+import { ScoreBoard } from '@/features/scoreBoard/components';
 import '@/i18n';
-import { useGame } from './store/gameStore';
 import { Toaster } from './ui/components/toaster';
-import { GameControls } from './features/game/components/GameControls';
+import { GameControls } from './features/gameControls/components/GameControls';
+import { useIsGameStarted } from './store/selectors';
+import { setupSubscriptions } from './store/subscriptions';
 
 const App: FC = () => {
   const { t } = useTranslation();
-  const { hasStarted } = useGame();
+  const hasStarted = useIsGameStarted();
+
+  const { cleanup } = setupSubscriptions();
+
+  useEffect(() => {
+    return cleanup;
+  }, [cleanup]);
 
   return (
     <>

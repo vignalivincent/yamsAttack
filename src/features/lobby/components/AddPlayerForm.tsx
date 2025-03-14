@@ -2,7 +2,7 @@ import { FC, useState, KeyboardEvent } from 'react';
 import { Button } from '@/ui/components/button';
 import { Input } from '@/ui/components/input';
 import { useToast } from '@/ui/hooks/use-toast';
-import { generateBarbaName } from '@/utils/nameGenerator';
+import { generateBarbaName } from '@/features/lobby/services/nameGenerator';
 import { t } from 'i18next';
 import { TOAST_MESSAGES } from '@/constants/toastMessages';
 import { MAX_NAME_LENGTH } from '@/constants/maxPlayerNameLength';

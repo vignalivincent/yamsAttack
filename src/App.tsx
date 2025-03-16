@@ -11,6 +11,9 @@ import { setupSubscriptions } from './store/subscriptions';
 const App: FC = () => {
   const { t } = useTranslation();
   const hasStarted = useIsGameStarted();
+  // const urlParams = new URLSearchParams(window.location.search);
+  // const isViewMode = urlParams.get('viewer');
+  // const gameId = urlParams.get('gameId');
 
   const { cleanup } = setupSubscriptions();
 

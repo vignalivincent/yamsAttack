@@ -27,7 +27,10 @@ export const useActions = () => ({
   addPlayer: useGameStore(useShallow((state) => state.addPlayer)),
   removePlayer: useGameStore(useShallow((state) => state.removePlayer)),
   addScore: useGameStore(useShallow((state) => state.addScore)),
+  revertScore: useGameStore(useShallow((state) => state.revertScore)),
   startGame: useGameStore(useShallow((state) => state.startGame)),
   endGame: useGameStore(useShallow((state) => state.endGame)),
   leaveGame: useGameStore(useShallow((state) => state.leaveGame)),
+  initLiveShare: useGameStore(useShallow((state) => state.initLiveShare)),
+  setViewMode: useGameStore(useShallow((state) => state.setViewMode)),
 });

@@ -20,9 +20,16 @@ interface GameStore {
   startGame: () => void;
   endGame: () => void;
   leaveGame: () => void;
+  setViewMode: (viewMode: boolean, gameId: string | null) => void;
   addScore: (score: Score) => void;
   revertScore: (score: Omit<Score, 'value'>) => void;
   updatePlayerScore: (score: Score) => void;
+
+  initLiveShare: () => void;
+  emitToSocket: (payLoad: Pick<GameStore, 'playerList' | 'gameHistoryList'>) => void;
+  receivesFromSocket: (payLoad: { gameState: Pick<GameStore, 'playerList' | 'gameHistoryList'> }) => void;
+  socket: WebSocket | null;
+  viewMode: boolean;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -36,6 +43,10 @@ export const useGameStore = create<GameStore>()(
         canAddPlayer: true,
         gameHistoryList: [],
         scoreStack: [],
+        viewMode: false,
+
+        socket: null,
+        socketGameId: null,
 
         addPlayer: (name) =>
           set((state) => {
@@ -128,9 +139,14 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
+        setViewMode: (viewMode) => {
+          set({ viewMode });
+        },
+
         updatePlayerScore: ({ playerId, category, value }) => {
-          set((state) => ({
-            playerList: state.playerList.map((player) =>
+          const { emitToSocket, gameHistoryList } = get();
+          set((state) => {
+            const newPlayerList = state.playerList.map((player) =>
               player.id === playerId
                 ? {
                     ...player,
@@ -140,8 +156,78 @@ export const useGameStore = create<GameStore>()(
                     },
                   }
                 : player
-            ),
-          }));
+            );
+            // Find a better pattern to update the socker
+            emitToSocket({ playerList: newPlayerList, gameHistoryList });
+            return { ...state, newPlayerList };
+          });
+        },
+        initLiveShare: () => {
+          // TODO : The connection is lost when the page is refreshed
+          try {
+            const { playerList, gameHistoryList, scoreStack } = get();
+
+            const socketServerBaseUrl = import.meta.env.VITE_SOCKET_SERVER_BASE_URL || 'http://localhost:8080';
+            const hostPlayerId = crypto.randomUUID();
+            const initGameurl = `${socketServerBaseUrl}/initSharedGame`;
+            const hostGameUrl = `${socketServerBaseUrl}/hostGame`;
+
+            fetch(initGameurl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              mode: 'cors',
+              body: JSON.stringify({
+                hostPlayerId,
+                gameState: {
+                  playerList,
+                  gameHistoryList,
+                  scoreStack,
+                },
+              }),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+              })
+              .then((data) => {
+                console.log('Live share initiated successfully:', data);
+                if (data.gameId) {
+                  const socket = new WebSocket(`${hostGameUrl}?hostId=${hostPlayerId}&gameId=${data.gameId}`);
+                  socket.onopen = () => {
+                    console.log('Socket connection established');
+                  };
+                  socket.onmessage = (event) => {
+                    console.log('Socket message received:', event.data);
+                  };
+
+                  set({ socket });
+                }
+              })
+              .catch((error) => {
+                console.error('Error initiating live share:', error);
+              });
+          } catch (err) {
+            console.error('Exception in initLiveShare:', err);
+          }
+        },
+        emitToSocket(payLoad) {
+          const { socket } = get();
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                gameState: { ...payLoad },
+              })
+            );
+          }
+        },
+        receivesFromSocket(payLoad) {
+          const { gameState } = payLoad;
+          set(gameState);
         },
       })),
       {

@@ -1,16 +1,23 @@
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useGameHistoryList, useIsGameEnded } from '@/store/selectors';
+import { useActions, useGameHistoryList, useIsGameEnded } from '@/store/selectors';
 import { useScoreBoardModals } from '../../hooks/useScoreBoardModals';
 import { useScoreBoardActions } from '../../hooks/useScoreBoardActions';
+import { Button } from '@/ui/components/button';
 
 export const GameActions: FC = () => {
   const { openRankingModal } = useScoreBoardModals();
   const { handleEndGameClick } = useScoreBoardActions();
+  const { initLiveShare } = useActions();
   const hasEnded = useIsGameEnded();
   const { t } = useTranslation();
   const gameHistoryList = useGameHistoryList();
+  const handleInitLiveShare = () => {
+    initLiveShare();
+  };
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const isViewMode = urlParams.get('viewer');
   return (
     <div className="flex gap-2 mt-8">
       <button
@@ -20,6 +27,13 @@ export const GameActions: FC = () => {
           transition-all shadow-lg hover:shadow-xl flex items-center justify-center`}>
         {hasEnded ? `${t('game.actions.new')} 🎲` : `${t('game.actions.end')} 🏁`}
       </button>
+      {!isViewMode && (
+        <Button
+          onClick={handleInitLiveShare}
+          className="w-12 sm:w-14 bg-blue-600/90 hover:bg-blue-600 text-white font-semibold h-12 sm:h-14 rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center">
+          🔗
+        </Button>
+      )}
 
       {gameHistoryList.length >= 1 && (
         <button

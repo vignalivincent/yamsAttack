@@ -18,7 +18,7 @@ export const ScoreModal: FC<ScoreModalProps> = ({ onYahtzee }) => {
   const { selectedCell } = useScoreBoardState();
   const playerList = usePlayerList();
   const { scoreModalOpen: isOpen, closeScoreModal: onClose } = useScoreBoardModals();
-  const { addScore } = useActions();
+  const { addScore, revertScore } = useActions();
   const [chanceValue, setChanceValue] = useState<string>('');
 
   const category = SCORE_CATEGORIES.find((c) => c.id === selectedCell!.category)!;
@@ -31,12 +31,18 @@ export const ScoreModal: FC<ScoreModalProps> = ({ onYahtzee }) => {
     if (category.id === 'yahtzee' && typeof value === 'number') {
       onYahtzee();
     }
-
-    addScore({
-      playerId: player.id,
-      category: category.id,
-      value,
-    });
+    if (!value) {
+      revertScore({
+        playerId: player.id,
+        category: category.id,
+      });
+    } else {
+      addScore({
+        playerId: player.id,
+        category: category.id,
+        value,
+      });
+    }
 
     onClose();
   };

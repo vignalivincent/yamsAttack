@@ -94,8 +94,8 @@ export const computeActivePlayerListStat = (players: Player[], gameHistory: Game
     });
 };
 
-const hasUnlockedUpperBonus = (player: Player, previousPlayers: Player[]): boolean => {
-  const previousPlayer = previousPlayers.find((p) => p.id === player.id);
+const hasUnlockedUpperBonus = (player: Player, playerList: Player[]): boolean => {
+  const previousPlayer = playerList.find((p) => p.id === player.id);
   if (!previousPlayer) return false;
 
   // Calculate upper section scores
@@ -114,7 +114,7 @@ const hasUnlockedUpperBonus = (player: Player, previousPlayers: Player[]): boole
   return previousSum < 63 && currentSum >= 63;
 };
 
-export const handleScoreNotification = (player: Player, score: Score, previousPlayers: Player[]) => {
+export const handleScoreNotification = (player: Player, score: Score, playerList: Player[]) => {
   const { category, value } = score;
 
   if (value === 'crossed') {
@@ -135,7 +135,7 @@ export const handleScoreNotification = (player: Player, score: Score, previousPl
     return;
   }
 
-  if (hasUnlockedUpperBonus(player, previousPlayers)) {
+  if (hasUnlockedUpperBonus(player, playerList)) {
     toast({
       title: 'Bonus Unlocked!',
       description: `${player.name} just unlocked the 35-point upper section bonus!`,

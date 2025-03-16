@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent } from '@/ui/components/dialog';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { useScoreBoardModals } from '../../hooks/useScoreBoardModals';
-import { useScoreBoardActions } from '../../hooks/useScoreBoardActions';
+import { useActions } from '@/store/selectors';
 
 export const ConfirmEndGameModal: FC = () => {
   const { confirmEndGameOpen: isOpen, closeConfirmEndGameModal: onClose } = useScoreBoardModals();
-  const { handleEndGameClick } = useScoreBoardActions();
+  const { endGame } = useActions();
   const { t } = useTranslation();
 
   return (
@@ -24,7 +24,7 @@ export const ConfirmEndGameModal: FC = () => {
           <button onClick={onClose} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-4 rounded-xl transition-colors text-lg">
             {t('common.cancel')}
           </button>
-          <button onClick={handleEndGameClick} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl transition-colors text-lg">
+          <button onClick={endGame} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl transition-colors text-lg">
             {t('common.confirm')}
           </button>
         </div>

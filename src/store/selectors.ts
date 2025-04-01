@@ -9,6 +9,8 @@ export const useIsGameStarted = () => useGameStore(useShallow((state) => state.i
 export const useIsGameEnded = () => useGameStore(useShallow((state) => state.isGameEnded));
 export const useIsGameCompleted = () => useGameStore(useShallow((state) => state.isGameCompleted));
 export const useCanAddPlayer = () => useGameStore(useShallow((state) => state.canAddPlayer));
+export const useHostId = () => useGameStore(useShallow((state) => state.hostId));
+export const useIsViewer = () => useGameStore(useShallow((state) => state.isViewer));
 
 // Derived state Selector
 export const useLeaderBoard = () => {
@@ -32,5 +34,8 @@ export const useActions = () => ({
   endGame: useGameStore(useShallow((state) => state.endGame)),
   leaveGame: useGameStore(useShallow((state) => state.leaveGame)),
   initLiveShare: useGameStore(useShallow((state) => state.initLiveShare)),
-  setViewMode: useGameStore(useShallow((state) => state.setViewMode)),
+  disconnectLiveShare: useGameStore(useShallow((state) => state.disconnectLiveShare)),
+  joinLiveShare: useGameStore(useShallow((state) => state.joinLiveShare)),
+  reconnectSocket: useGameStore(useShallow((state) => state.reconnectSocket)),
+  setGameId: useGameStore(useShallow((state) => state.setGameId)),
 });

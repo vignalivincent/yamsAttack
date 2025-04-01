@@ -5,15 +5,31 @@ import { ScoreBoard } from '@/features/scoreBoard/components';
 import '@/i18n';
 import { Toaster } from './ui/components/toaster';
 import { GameControls } from './features/gameControls/components/GameControls';
-import { useIsGameStarted } from './store/selectors';
+import { useActions, useHostId, useIsGameStarted } from './store/selectors';
 import { setupSubscriptions } from './store/subscriptions';
 
 const App: FC = () => {
   const { t } = useTranslation();
   const hasStarted = useIsGameStarted();
-  // const urlParams = new URLSearchParams(window.location.search);
-  // const isViewMode = urlParams.get('viewer');
-  // const gameId = urlParams.get('gameId');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const isViewMode = urlParams.get('viewer');
+  const gameId = urlParams.get('gameId');
+
+  const hostId = useHostId();
+  const { joinLiveShare, setGameId, reconnectSocket } = useActions();
+
+  if (isViewMode) {
+    setGameId(isViewMode);
+    if (gameId) {
+      setGameId(gameId);
+    }
+    joinLiveShare();
+  } else {
+    if (hostId) {
+      reconnectSocket();
+    }
+  }
 
   const { cleanup } = setupSubscriptions();
 

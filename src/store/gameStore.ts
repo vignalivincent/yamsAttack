@@ -20,16 +20,22 @@ interface GameStore {
   startGame: () => void;
   endGame: () => void;
   leaveGame: () => void;
-  setViewMode: (viewMode: boolean, gameId: string | null) => void;
   addScore: (score: Score) => void;
   revertScore: (score: Omit<Score, 'value'>) => void;
   updatePlayerScore: (score: Score) => void;
 
+  setHostId: (hostId: string) => void;
+  setGameId: (hostId: string) => void;
+  hostId: string | null;
+  gameId: string | null;
+  socket: WebSocket | null;
+  isViewer: boolean;
   initLiveShare: () => void;
+  disconnectLiveShare: () => void;
+  joinLiveShare: () => void;
+  reconnectSocket: () => void;
   emitToSocket: (payLoad: Pick<GameStore, 'playerList' | 'gameHistoryList'>) => void;
   receivesFromSocket: (payLoad: { gameState: Pick<GameStore, 'playerList' | 'gameHistoryList'> }) => void;
-  socket: WebSocket | null;
-  viewMode: boolean;
 }
 
 export const useGameStore = create<GameStore>()(
@@ -43,10 +49,12 @@ export const useGameStore = create<GameStore>()(
         canAddPlayer: true,
         gameHistoryList: [],
         scoreStack: [],
-        viewMode: false,
 
         socket: null,
         socketGameId: null,
+        hostId: null,
+        gameId: null,
+        isViewer: false,
 
         addPlayer: (name) =>
           set((state) => {
@@ -139,10 +147,6 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
-        setViewMode: (viewMode) => {
-          set({ viewMode });
-        },
-
         updatePlayerScore: ({ playerId, category, value }) => {
           const { emitToSocket, gameHistoryList } = get();
           set((state) => {
@@ -164,14 +168,22 @@ export const useGameStore = create<GameStore>()(
             return { ...state, playerList: newPlayerList };
           });
         },
-        initLiveShare: () => {
-          // TODO : The connection is lost when the page is refreshed
 
+        setHostId: (hostId) => {
+          set({ hostId });
+        },
+
+        setGameId: (gameId) => {
+          set({ gameId });
+        },
+
+        initLiveShare: () => {
           try {
-            const { playerList, gameHistoryList, scoreStack } = get();
+            const { playerList, gameHistoryList, scoreStack, setHostId, setGameId } = get();
 
             const socketServerBaseUrl = import.meta.env.VITE_SOCKET_SERVER_BASE_URL || 'http://localhost:8080';
             const hostPlayerId = crypto.randomUUID();
+            setHostId(hostPlayerId);
             const initGameurl = `${socketServerBaseUrl}/initSharedGame`;
             const hostGameUrl = `${socketServerBaseUrl}/hostGame`;
 
@@ -200,23 +212,84 @@ export const useGameStore = create<GameStore>()(
               .then((data) => {
                 console.log('Live share initiated successfully:', data);
                 if (data.gameId) {
+                  console.log(data.gameId);
                   const socket = new WebSocket(`${hostGameUrl}?hostId=${hostPlayerId}&gameId=${data.gameId}`);
                   socket.onopen = () => {
-                    console.log('Socket connection established');
+                    console.log('[HOST] - Socket connection established');
                   };
                   socket.onmessage = (event) => {
-                    console.log('Socket message received:', event.data);
+                    console.log('[HOST] -Socket message received:', event.data);
                   };
-
+                  socket.onclose = (event) => {
+                    if (event.wasClean) {
+                      console.log('[HOST] -Socket connection closed cleanly');
+                      return set({ socket: null });
+                    }
+                    console.log('[HOST] -Socket connection closed not cleanly');
+                    set({ socket: null, gameId: null, hostId: null });
+                  };
+                  setGameId(data.gameId);
                   set({ socket });
                 }
               })
               .catch((error) => {
-                console.error('Error initiating live share:', error);
+                console.error('[HOST] -Error initiating live share:', error);
               });
           } catch (err) {
-            console.error('Exception in initLiveShare:', err);
+            console.error('[HOST] -Exception in initLiveShare:', err);
           }
+        },
+        joinLiveShare: () => {
+          const { gameId } = get();
+          if (!gameId) {
+            console.error('Game ID is required to join a live share');
+            return;
+          }
+          const socketServerBaseUrl = import.meta.env.VITE_SOCKET_SERVER_BASE_URL || 'http://localhost:8080';
+          const viewBaseUrl = `${socketServerBaseUrl}/viewGame`;
+          const socket = new WebSocket(`${viewBaseUrl}?gameId=${gameId}`);
+          socket.onopen = () => {
+            console.log('[VIEWER] - Socket connection established');
+          };
+          set({ isViewer: true });
+          socket.onmessage = (event) => {
+            console.log('[VIEWER] - Socket message received:');
+            const { playerList, gameHistoryList } = JSON.parse(event.data).gameState;
+            console.log('MSG', playerList);
+            console.log('LOCAL', get().playerList);
+            set({ isGameStarted: true, playerList, gameHistoryList });
+          };
+          set({ socket });
+        },
+        reconnectSocket: () => {
+          const { hostId, gameId, socket } = get();
+          if (hostId && gameId && !socket) {
+            const socketServerBaseUrl = import.meta.env.VITE_SOCKET_SERVER_BASE_URL || 'http://localhost:8080';
+            const hostGameUrl = `${socketServerBaseUrl}/hostGame`;
+            const socket = new WebSocket(`${hostGameUrl}?hostId=${hostId}&gameId=${gameId}`);
+            socket.onopen = () => {
+              console.log('[HOST] - Socket connection RE-established');
+            };
+            socket.onmessage = (event) => {
+              console.log('[HOST] - Socket message received:', event.data);
+            };
+            socket.onclose = (event) => {
+              if (event.wasClean) {
+                console.log('[HOST] - Socket connection closed cleanly');
+                return set({ socket: null });
+              }
+              console.log('[HOST] - Socket connection closed not cleanly');
+              set({ socket: null, gameId: null, hostId: null });
+            };
+            set({ socket });
+          }
+        },
+        disconnectLiveShare: () => {
+          const { socket } = get();
+          if (socket) {
+            socket.close();
+          }
+          set({ socket: null, gameId: null, hostId: null });
         },
         emitToSocket(payLoad) {
           console.log(payLoad);
@@ -242,6 +315,8 @@ export const useGameStore = create<GameStore>()(
           isGameStarted: state.isGameStarted,
           gameHistoryList: state.gameHistoryList,
           scoreStack: state.scoreStack,
+          hostId: state.hostId,
+          gameId: state.gameId,
         }),
       }
     ),

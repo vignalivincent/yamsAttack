@@ -15,9 +15,9 @@ export function setupSubscriptions() {
   const unsubscribeScoreStack = useGameStore.subscribe(
     (state) => state.scoreStack,
     (scoreStack, previousScoreStack) => {
-      const { playerList, gameHistoryList, viewMode, updatePlayerScore, endGame, emitToSocket } = useGameStore.getState();
-
-      if (viewMode) {
+      const { playerList, gameHistoryList, updatePlayerScore, endGame, emitToSocket, isViewer } = useGameStore.getState();
+      if (isViewer) {
+        console.error('Viewer cannot update score stack');
         return;
       }
 

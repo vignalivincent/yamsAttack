@@ -146,24 +146,27 @@ export const useGameStore = create<GameStore>()(
         updatePlayerScore: ({ playerId, category, value }) => {
           const { emitToSocket, gameHistoryList } = get();
           set((state) => {
-            const newPlayerList = state.playerList.map((player) =>
-              player.id === playerId
-                ? {
-                    ...player,
-                    scores: {
-                      ...player.scores,
-                      [category]: value,
-                    },
-                  }
-                : player
-            );
-            // Find a better pattern to update the socker
+            const newPlayerList = state.playerList.map((player) => {
+              if (player.id === playerId) {
+                return {
+                  ...player,
+                  scores: {
+                    ...player.scores,
+                    [category]: value,
+                  },
+                };
+              }
+              return player;
+            });
+
+            // Find a better pattern to update the socket
             emitToSocket({ playerList: newPlayerList, gameHistoryList });
-            return { ...state, newPlayerList };
+            return { ...state, playerList: newPlayerList };
           });
         },
         initLiveShare: () => {
           // TODO : The connection is lost when the page is refreshed
+
           try {
             const { playerList, gameHistoryList, scoreStack } = get();
 
@@ -216,6 +219,7 @@ export const useGameStore = create<GameStore>()(
           }
         },
         emitToSocket(payLoad) {
+          console.log(payLoad);
           const { socket } = get();
           if (socket && socket.readyState === WebSocket.OPEN) {
             socket.send(

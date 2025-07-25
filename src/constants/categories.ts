@@ -81,3 +81,9 @@ export const SCORE_CATEGORIES: ScoreCategoryUI[] = [
     section: SectionEnum.upper,
   },
 ];
+
+export type ScoreCategoryName = (typeof SCORE_CATEGORIES)[number]['id'];
+
+export const upperCategories: ScoreCategoryName[] = SCORE_CATEGORIES.filter(
+  (category) => category.section === SectionEnum.upper && category.id !== 'bonus'
+).map((category) => category.id) as ScoreCategoryName[];

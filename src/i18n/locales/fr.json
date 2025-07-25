@@ -7,7 +7,9 @@
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "back": "Retour",
-    "close": "Fermer"
+    "close": "Fermer",
+    "copy": "Copier",
+    "copied": "Copié ! ✅"
   },
   "players": {
     "input": {
@@ -144,6 +146,16 @@
     "gamesPlayed": "Parties jouées",
     "averageScore": "Score moyen"
   },
+  "sharedUrl": {
+    "title": "Partagez votre partie",
+    "description": "Copiez l'URL ci-dessous pour partager votre partie avec d'autres joueurs.",
+    "url": "URL de la partie",
+    "actions": {
+      "copy": "Copier l'URL",
+      "close": "Fermer"
+    },
+    "hint": "Partagez cette URL pour que d'autres joueurs puissent visualiser votre partie. Vous resterez le seul à pouvoir modifier les scores."
+  },
   "toast": {
     "gameEnded": {
       "title": "❌ Partie terminée",
@@ -178,6 +190,27 @@
     "maxPlayers": {
       "title": "Maximum atteint",
       "description": "Vous ne pouvez pas ajouter plus de 5 joueurs"
+    },
+
+    "liveShareStarted": {
+      "title": "Partage en direct activé",
+      "description": "Vous pouvez maintenant partager votre partie avec d'autres joueurs."
+    },
+    "liveShareEnded": {
+      "title": "Partage en direct désactivé",
+      "description": "Le partage en direct a été arrêté."
+    },
+    "liveShareAlreadyDown": {
+      "title": "Aucun partage en direct",
+      "description": "Le partage en direct n'est pas actif."
+    },
+    "liveShareAlreadyUp": {
+      "title": "Partage en direct déjà activé",
+      "description": "Copier et partager l'URL pour inviter des spectateurs."
+    },
+    "copied": {
+      "title": "Copié !",
+      "description": "Le texte a été copié dans le presse-papiers."
     }
   },
   "animations": {

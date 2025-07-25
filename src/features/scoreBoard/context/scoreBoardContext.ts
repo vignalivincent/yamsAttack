@@ -25,6 +25,9 @@ export interface ScoreBoardContextState {
 
   confirmEndGameOpen: boolean;
   setConfirmEndGameOpen: (open: boolean) => void;
+
+  sharedGameUrlModalOpen: boolean;
+  setSharedGameUrlModalOpen: (open: boolean) => void;
 }
 
 export const ScoreBoardContext = createContext<ScoreBoardContextState | undefined>(undefined);

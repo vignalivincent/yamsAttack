@@ -1,7 +1,9 @@
 import { BONUS } from '@/constants/bonus';
-import { SCORE_CATEGORIES } from '@/constants/categories';
+import { SCORE_CATEGORIES, upperCategories } from '@/constants/categories';
+import { TOAST_MESSAGES } from '@/constants/toastMessages';
 import { BonusCategory, GameHistory, Leaderboard, Player, PlayerStats, Score, ScoreCategory, ScoreState, SectionEnum } from '@/types/game';
 import { toast } from '@/ui/hooks/use-toast';
+import i18next from 'i18next';
 
 export const getMaxScore = (category: ScoreCategory): number => {
   const standardCategory = category as Exclude<ScoreCategory, BonusCategory>;
@@ -94,61 +96,51 @@ export const computeActivePlayerListStat = (players: Player[], gameHistory: Game
     });
 };
 
-const hasUnlockedUpperBonus = (player: Player, playerList: Player[]): boolean => {
-  const previousPlayer = playerList.find((p) => p.id === player.id);
-  if (!previousPlayer) return false;
+const hasUnlockedUpperBonus = (scoreStack: Score[], player: Player): boolean => {
+  const newScore = scoreStack[scoreStack.length - 1];
+  const { category, value, playerId } = newScore;
 
-  // Calculate upper section scores
-  const upperCategories = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
-
-  const previousSum = upperCategories.reduce((sum, category) => {
-    const score = previousPlayer.scores[category as ScoreCategory];
-    return sum + (typeof score === 'number' ? score : 0);
-  }, 0);
-
-  const currentSum = upperCategories.reduce((sum, category) => {
-    const score = player.scores[category as ScoreCategory];
-    return sum + (typeof score === 'number' ? score : 0);
-  }, 0);
-
-  return previousSum < 63 && currentSum >= 63;
+  if (upperCategories.includes(category) && typeof value === 'number' && playerId === player.id) {
+    const previousTotal = calculateSectionTotal(player, SectionEnum.upper);
+    const newTotal = previousTotal + value;
+    if (previousTotal < BONUS.upper.threshold && newTotal >= BONUS.upper.threshold) {
+      return true;
+    }
+  }
+  return false;
 };
 
-export const handleScoreNotification = (player: Player, score: Score, playerList: Player[]) => {
+export const handleScoreNotification = (scoreStack: Score[], player: Player) => {
+  const score = scoreStack[scoreStack.length - 1];
   const { category, value } = score;
+
+  const { t } = i18next;
+  if (hasUnlockedUpperBonus(scoreStack, player)) {
+    toast({
+      title: t(TOAST_MESSAGES.unlockBonus.title),
+      description: t(TOAST_MESSAGES.unlockBonus.description, { name: player.name }),
+      variant: TOAST_MESSAGES.unlockBonus.variant,
+    });
+    return;
+  }
 
   if (value === 'crossed') {
     toast({
-      title: 'Ouch! Zero points',
-      description: `${player.name} scored a big fat ZERO in ${category}. Better luck next time!`,
-      variant: 'destructive',
+      title: t(TOAST_MESSAGES.zeroScore.title),
+      description: t(TOAST_MESSAGES.zeroScore.description, { name: player.name }),
+      variant: TOAST_MESSAGES.zeroScore.variant,
     });
     return;
   }
 
   if (value === getMaxScore(category)) {
     toast({
-      title: 'Perfect Score!',
-      description: `${player.name} got a maximum score in ${category}. Impressive!`,
-      variant: 'success',
+      title: t(TOAST_MESSAGES.maxScore.title),
+      description: t(TOAST_MESSAGES.maxScore.description, { name: player.name, category: t(`scoreCategories.${category}`) }),
+      variant: TOAST_MESSAGES.maxScore.variant,
     });
     return;
   }
-
-  if (hasUnlockedUpperBonus(player, playerList)) {
-    toast({
-      title: 'Bonus Unlocked!',
-      description: `${player.name} just unlocked the 35-point upper section bonus!`,
-      variant: 'success',
-    });
-    return;
-  }
-
-  toast({
-    title: 'Score Registered',
-    description: `${player.name} scored ${value} points in ${category}`,
-    variant: 'default',
-  });
 };
 
 export const getLatestScoreFromStack = (current: Score[]): Score => {

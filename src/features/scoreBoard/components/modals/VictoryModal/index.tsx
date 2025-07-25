@@ -9,7 +9,7 @@ import { useScoreBoardModals } from '../../../hooks/useScoreBoardModals';
 export const VictoryModal: FC = () => {
   const { victoryModalOpen: isOpen, closeVictoryModal: onClose } = useScoreBoardModals();
   const { t } = useTranslation();
-  const { leaveGame } = useActions();
+  const { restartGame } = useActions();
   const leaderboard = useLeaderBoard();
   const winner = leaderboard[0];
 
@@ -38,7 +38,7 @@ export const VictoryModal: FC = () => {
             {t('victory.actions.close')}
           </button>
           <button
-            onClick={leaveGame}
+            onClick={restartGame}
             className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl transition-colors text-lg shadow-md hover:shadow-lg border-2 border-purple-400">
             {t('victory.actions.newGame')}
           </button>

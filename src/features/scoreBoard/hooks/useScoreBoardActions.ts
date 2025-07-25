@@ -4,7 +4,7 @@ import { useActions, useIsGameEnded } from '@/store/selectors';
 import { useScoreBoardContext } from '../context/useScoreBoardContext';
 
 export const useScoreBoardActions = () => {
-  const { leaveGame } = useActions();
+  const { restartGame } = useActions();
   const hasEnded = useIsGameEnded();
   const { setSelectedCell, setScoreModalOpen, setConfirmEndGameOpen } = useScoreBoardContext();
 
@@ -18,16 +18,16 @@ export const useScoreBoardActions = () => {
 
   const handleEndGameClick = useCallback(() => {
     if (hasEnded) {
-      leaveGame();
+      restartGame();
       return;
     }
     setConfirmEndGameOpen(true);
-  }, [hasEnded, leaveGame, setConfirmEndGameOpen]);
+  }, [hasEnded, restartGame, setConfirmEndGameOpen]);
 
   const handleEndGameConfirm = useCallback(() => {
-    leaveGame();
+    restartGame();
     setConfirmEndGameOpen(false);
-  }, [leaveGame, setConfirmEndGameOpen]);
+  }, [restartGame, setConfirmEndGameOpen]);
 
   return {
     handleCellClick,

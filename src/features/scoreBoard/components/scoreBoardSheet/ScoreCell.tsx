@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { Player, ScoreCategoryUI } from '@/types/game';
 import { getMaxScore, getScoreStyle } from '@/store/utils';
+import { useIsViewer } from '@/store/selectors';
 
 interface ScoreCellProps {
   category: ScoreCategoryUI;
@@ -13,6 +14,7 @@ interface ScoreCellProps {
 export const ScoreCell: FC<ScoreCellProps> = ({ category, player, onSelect, shouldCollapse = false, isGameEnded = false }) => {
   const score = player.scores[category.id];
   const maxScore = getMaxScore(category.id);
+  const isViewer = useIsViewer();
 
   const renderScoreDisplay = () => {
     if (score === undefined) return '-';
@@ -23,7 +25,7 @@ export const ScoreCell: FC<ScoreCellProps> = ({ category, player, onSelect, shou
   return (
     <button
       onClick={() => onSelect(player.id, category.id)}
-      disabled={isGameEnded}
+      disabled={isGameEnded || isViewer}
       className={`
         w-full font-bold rounded-lg transition-colors flex items-center justify-center
         ${shouldCollapse ? 'h-10 text-base' : 'h-12 text-lg'}

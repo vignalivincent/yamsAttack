@@ -10,6 +10,8 @@ export const useScoreBoardModals = () => {
     scoreModalOpen,
     setVictoryModalOpen,
     setScoreModalOpen,
+    sharedGameUrlModalOpen,
+    setSharedGameUrlModalOpen,
   } = useScoreBoardContext();
   return {
     scoreModalOpen,
@@ -27,5 +29,9 @@ export const useScoreBoardModals = () => {
     victoryModalOpen,
     openVictoryModal: () => setVictoryModalOpen(true),
     closeVictoryModal: () => setVictoryModalOpen(false),
+
+    sharedGameUrlModalOpen,
+    openSharedGameUrlModal: () => setSharedGameUrlModalOpen(true),
+    closeSharedGameUrlModal: () => setSharedGameUrlModalOpen(false),
   };
 };

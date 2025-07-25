@@ -15,6 +15,7 @@ export const ScoreBoardProvider: FC<ScoreBoardProviderProps> = ({ children }) =>
   const [victoryModalOpen, setVictoryModalOpen] = useState(false);
   const [rankingModalOpen, setRankingModalOpen] = useState(false);
   const [confirmEndGameOpen, setConfirmEndGameOpen] = useState(false);
+  const [sharedGameUrlModalOpen, setSharedGameUrlModalOpen] = useState(false);
 
   const value = {
     selectedCell,
@@ -33,6 +34,8 @@ export const ScoreBoardProvider: FC<ScoreBoardProviderProps> = ({ children }) =>
     setRankingModalOpen,
     confirmEndGameOpen,
     setConfirmEndGameOpen,
+    sharedGameUrlModalOpen,
+    setSharedGameUrlModalOpen,
   };
 
   return <ScoreBoardContext.Provider value={value}>{children}</ScoreBoardContext.Provider>;

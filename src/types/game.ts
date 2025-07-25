@@ -8,6 +8,27 @@ export enum SectionEnum {
   lower = 'lower',
 }
 
+export enum LiveShareHostStatus {
+  HOST_DISCONNECTED = 'HostDisconnected',
+  HOST_NEVER_CONNECTED = 'HostNeverConnected',
+  HOST_CONNECTED = 'HostConnected',
+}
+
+export enum LiveSharePayloadType {
+  VIEWER_JOINED = 'viewerJoined',
+  GAMESTATE = 'gameState',
+}
+
+export interface SocketPayload {
+  type: LiveShareHostStatus | LiveSharePayloadType;
+  message: string;
+  gameState?: {
+    playerList: Player[];
+    gameHistoryList: GameHistory[];
+  };
+  playerId?: string;
+}
+
 export type ScoreState = 'crossed' | number | undefined;
 export type TotalRowVariant = 'default' | 'bonus' | 'total';
 

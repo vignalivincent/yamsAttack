@@ -10,6 +10,11 @@ export const ConfirmEndGameModal: FC = () => {
   const { endGame } = useActions();
   const { t } = useTranslation();
 
+  const handleEndGame = () => {
+    endGame();
+    onClose();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent fullWidth className="space-y-6">
@@ -24,7 +29,7 @@ export const ConfirmEndGameModal: FC = () => {
           <button onClick={onClose} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-4 rounded-xl transition-colors text-lg">
             {t('common.cancel')}
           </button>
-          <button onClick={endGame} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl transition-colors text-lg">
+          <button onClick={handleEndGame} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl transition-colors text-lg">
             {t('common.confirm')}
           </button>
         </div>

@@ -15,6 +15,7 @@ import { calculateSectionTotal, getUpperBonus } from '@/store/utils';
 import { useScoreBoardState } from '../hooks/useScoreBoardState';
 import { usePlayerList } from '@/store/selectors';
 import { ScoreBoardProvider } from '../context/scoreBoardContextProvider';
+import { SharedGameUrlModal } from './modals/SharedGameUrl';
 
 const ScoreBoardContent: FC = () => {
   const players = usePlayerList();
@@ -55,6 +56,7 @@ const ScoreBoardContent: FC = () => {
       <VictoryModal />
       <RankingModal />
       <ConfirmEndGameModal />
+      <SharedGameUrlModal />
       <YahtzeeAnimation isActive={isAnimationActive} onComplete={handleAnimationComplete} duration={animationDuration} />
     </>
   );

@@ -10,7 +10,6 @@ interface ScoreGridProps {
 
 export const ScoreGrid: FC<ScoreGridProps> = ({ scores, onSelect, onBarrer, onReset }) => {
   const { t } = useTranslation();
-
   return (
     <>
       <div className={`grid ${scores.length === 1 ? '' : 'grid-cols-3'} gap-3`}>
